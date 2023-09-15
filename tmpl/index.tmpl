@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Import style -->
+    <link rel="stylesheet" href="./static/element-ui.css"/>
+    <link rel="stylesheet" href="./static/index.css">
+    <link rel="icon" href="./static/favicon.ico">
+    <!-- Import Vue 3 -->
+    <script src="./static/vue.js"></script>
+    <!-- Import component library -->
+    <script src="./static/element-plus.js"></script>
+    <title>index</title>
+</head>
+
+<script type="module">
+    const app = Vue.createApp({
+        data() {
+            return {
+                list: [],
+                visible: false,
+                top: 0,
+                left: 0,
+                curren_id: 0,
+            }
+        },
+        created() {
+            fetch('./get_list')
+                .then(res => res.json())
+                .then(res => {
+                    this.list = res.list
+                    console.log("length: ", this.list.length)
+                })
+        },
+        watch: {
+            visible(value) {
+                if (value) {
+                    document.body.addEventListener('click', this.closeMenu)
+                } else {
+                    document.body.removeEventListener('click', this.closeMenu)
+                }
+            }
+        },
+        methods: {
+            preview(index){
+                // if index is -1, then preview the current image
+                if (index === -1) {
+                    index = this.curren_id
+                }
+                console.log(index)
+                // open a new window and open the url
+                window.open("../img/get?id=" + this.list[index])
+            },
+            delete_img(){
+                // delete the current image
+                fetch('../img/delete?id=' + this.list[this.curren_id])
+                    .then(res => res.json())
+                    .then(res => {
+                        // show the success message
+                        if (res.msg === "pong") {
+                            this.$messageBox({
+                                title: 'Success',
+                                message: 'Delete successfully',
+                                type: 'success',
+                                confirmButtonText: 'OK',
+                                callback: () => {
+                                    window.location.reload()
+                                }
+                            })
+                        }
+                    })
+            },
+            copy_id(){
+                const target_id = this.list[this.curren_id]
+                // copy the id to the clipboard
+                navigator.clipboard.writeText(target_id)
+                    .then(() => {
+                        this.$message({
+                            message: 'Copy successfully',
+                            type: 'success'
+                        });
+                    })
+                    .catch(err => {
+                        this.$message({
+                            message: 'Copy failed',
+                            type: 'error'
+                        });
+                    });
+            },
+            reload(){
+                window.location.reload()
+            },
+            openMenu(e, id) {
+                // get the id of the current image
+                this.curren_id = id
+                // prevent the default context menu
+                e.preventDefault();
+                // get the position of the mouse and cal the real position
+                const scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+                const scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+                const x = e.pageX || e.clientX + scrollX;
+                const y = e.pageY || e.clientY + scrollY;
+                this.left =  x
+                this.top = y
+
+                this.visible = true
+            },
+            closeMenu() {
+                this.visible = false
+            },
+        }
+    })
+
+    app.use(ElementPlus)
+    app.mount('#app')
+</script>
+
+<body>
+    <div id="app">
+        <div id="control">
+            <el-button type="primary" @click="reload" id="add_button">Refresh</el-button>
+
+            <el-upload
+                    class="upload"
+                    action="../img/post"
+                    multiple
+                    :limit="1"
+                    :on-success="reload"
+            >
+                <el-button type="primary" id="upload_button">Click to upload</el-button>
+                <template #tip>
+                    <div class="el-upload__tip">
+                        jpg/png files with a size less than 500KB.
+                    </div>
+                </template>
+            </el-upload>
+        </div>
+
+        <ul v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
+            <li @click="preview(-1)">Click To Check</li>
+            <li @click="delete_img">Delete The Pic</li>
+            <li @click="copy_id">Copy The ID</li>
+        </ul>
+
+        <div id="data">
+            {{range $i, $v := .list}}
+            <div id="card" @click="preview({{$i}})">
+                <img src="../img/get?id={{$v}}" class="img-item"
+                     @contextmenu.prevent.native="openMenu($event, {{$i}})">
+            </div>
+            {{end}}
+        </div>
+    </div>
+</body>
+</html>

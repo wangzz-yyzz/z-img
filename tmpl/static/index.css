@@ -1,0 +1,100 @@
+div{
+
+}
+
+body{
+    display: flex;
+    justify-content: center;
+}
+
+#app{
+    display: flex;
+    width: 85%;
+    margin-top: 50px;
+    margin-bottom: 100px;
+
+    flex-direction: column;
+    alignment: center;
+}
+
+#control{
+    display: flex;
+    flex-direction: row;
+}
+
+#data{
+    display: flex;
+    width: 100%;
+
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+#card{
+    height: 170px;
+    width: 170px;
+
+    margin: 5px;
+
+    box-shadow: var(--el-box-shadow);
+}
+
+#card:hover{
+    cursor: pointer;
+
+    box-shadow: var(--el-box-shadow-dark);
+    height: 170px;
+    width: 170px;
+}
+
+.img-item{
+    height: 170px;
+    width: 170px;
+}
+
+.img-item:hover{
+    height: 170px;
+    width: 170px;
+}
+
+#add_button{
+    width: 200px;
+    height: 50px;
+
+    margin-right: 50px;
+}
+
+#upload_button{
+    width: 200px;
+    height: 50px;
+}
+
+.contextmenu {
+    margin: 0;
+    background: #ffffff;
+    z-index: 3000;
+    position: absolute;
+    list-style-type: none;
+    padding: 5px 0;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 200;
+    color: #333;
+    box-shadow: var(--el-box-shadow-dark);
+}
+
+li:hover {
+     background: #dedcdc;
+ }
+
+li {
+    margin: 0;
+    padding: 7px 16px;
+    cursor: pointer;
+
+    width: 150px;
+    height: 30px;
+
+    line-height: 30px;
+}
